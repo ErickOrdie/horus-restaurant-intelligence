@@ -1,0 +1,20 @@
+# Hórus — roadmap
+- [x] Fase 1: identidade, design system, layout, login, banco, permissões, modo demonstração
+- [x] Dashboard executivo, Monitoramento do salão, Alertas, Cadastro de alimentos, Auditoria
+- [x] Módulos do menu ativados (páginas com dados reais); webcam na Central de câmeras; login só por e-mail
+- [ ] Fase 2: composição dos pratos, filas, jornada, limpeza, desperdício, buffet
+- [x] Fase 3 (parte 1): câmeras, laboratório, modelos de IA, integração com o motor, serviço ai-engine de referência
+- [x] Fase 3 (parte 2): regiões e histórico no Laboratório
+- [ ] Streaming contínuo de câmeras IP/RTSP (bloqueado: serviço gerenciado e câmeras ainda não configurados)
+- [x] Migração serverless: API hospedada Roboflow, configuração segura, cadastro de modelos, laboratório e webcam
+- [x] Consumo: limites transacionais, histórico, custos estimados e atualização em tempo real
+- [x] Privacidade: armazenamento privado opcional e documentação das limitações RTSP
+- [ ] Integração definitiva: validar Workflow restaurant-people-and-table-counts-1795663226516 com resposta real
+- [ ] Hórus Live: contagens reais, imagem processada e controles de monitoramento
+- [ ] Hórus Flow: indicadores agregados persistidos e históricos
+- [ ] Hórus Clean: regiões fixas, histórico e confirmação operacional
+- [ ] Conferir captura de tela indicada pelo usuário para validação do salão (aguarda arquivo disponível)
+- [ ] Validar continuidade temporal e documentar limites de vídeo
+- [x] Conferir restaurant-operations: projeto real no workspace ordies-workspace, cadastrado como pendente
+- [ ] Fase 4: análise financeira, qualidade, Hórus AI, relatórios, pesquisa de satisfação
+- [ ] Fase 5: administração multi-tenant, segurança, monitoramento técnico, documentação
