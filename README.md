@@ -1,33 +1,80 @@
-# Welcome to your Lovable project
+# Hórus — AI Restaurant Intelligence
 
-This project was built with [Lovable](https://lovable.dev).
+Plataforma de inteligência operacional para restaurantes: visão computacional aplicada ao salão,
+controle de mesas, desperdício alimentar, atendimento e indicadores de gestão.
+Primeiro cliente: Bovinu'S Grill & Beer — unidade Augusta (buffet de almoço).
 
-## Build with Lovable
+Interface em português (pt-BR), tema claro, autenticação por e-mail e senha.
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+## O que está aqui
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+| Pasta | Conteúdo |
+| --- | --- |
+| `src/routes/` | Páginas: dashboard, salão, alertas, alimentos, auditoria, câmeras, modelos, laboratório, integrações, consumo e módulos |
+| `src/components/horus/` | Componentes próprios do Hórus (cabecalho, menu, gráficos, webcam, painéis de visão) |
+| `src/lib/` | Regras de negócio: indicadores (`metrics.ts`), parser do workflow de restaurante (`restaurant.ts`), normalização das detecções (`roboflow.ts`), funções de servidor |
+| `drizzle/migrations/` | Histórico de migrações do banco (multiempresa, RLS, visão, ocupação, regiões de mesa) |
+| `supabase/` | Configuração do backend |
+| `ai-engine/` | Adaptador Python opcional (Supervision + RF-DETR) para quem preferir rodar a visão localmente |
+| `docs/` | Documentação da integração de visão hospedada |
 
-## Development
+## Requisitos
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- Node.js 20+ e Bun (ou npm)
+- Um backend Lovable Cloud (Supabase) para banco, autenticação e storage
+- Uma conta Roboflow com um projeto publicado, para as análises de imagem
+
+## Rodando localmente
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+git clone https://github.com/ErickOrdie/horus-restaurant-intelligence.git
+cd horus-restaurant-intelligence
+bun install
+bun run dev
 ```
 
-## Built with
+Depois, crie um arquivo `.env` na raiz com os valores do seu backend:
 
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
+```text
+VITE_SUPABASE_URL=<url do seu backend>
+VITE_SUPABASE_PUBLISHABLE_KEY=<chave pública do seu backend>
+SUPABASE_URL=<url do seu backend>
+SUPABASE_PUBLISHABLE_KEY=<chave pública do seu backend>
+ROBOFLOW_API_KEY=<chave da sua conta Roboflow>
+```
 
-## Hórus — visão hospedada
+As variáveis sem o prefixo `VITE_` só existem no servidor. A chave da Roboflow nunca vai para o
+navegador: as análises partem de funções de servidor autenticadas.
 
-As análises de imagens usam a API hospedada da Roboflow, sem exigir instalação local de Python ou Docker. Configuração, situação real do projeto Restaurant Operations, custos e limitações estão em [docs/roboflow-serverless.md](docs/roboflow-serverless.md).
+Para aplicar o banco, use as migrações em `drizzle/migrations/` na ordem em que aparecem.
+
+## Testes
+
+```sh
+bunx vitest run
+```
+
+Cobrem as fórmulas dos indicadores, o parser do workflow de restaurante e a normalização das
+detecções (nada de valores inventados: detecção ausente vira "não conectado", nunca uma lista vazia
+aparentemente válida).
+
+## Avisos antes de usar com clientes reais
+
+- O repositório contém **dados fictícios de demonstração** (análises, alertas, pratos, atendimentos).
+  Apague-os antes de operar com clientes reais.
+- Os números do cartão "Agora no salão" e de "32 mesas" na página inicial são fixos e não vêm do banco.
+- Estados de mesa vindos do workflow são **estimativas** por imagem; só viram registro confirmado
+  quando há confirmação operacional.
+- A leitura de desperdício e a identificação dos pratos do buffet dependem de um modelo treinado com
+  fotos do próprio restaurante.
+
+## Documentação
+
+- [docs/roboflow-serverless.md](docs/roboflow-serverless.md) — integração de visão hospedada, custos e limites
+- [AGENTS.md](AGENTS.md) — decisões técnicas e regras do projeto
+- [roadmap.md](roadmap.md) — o que já foi entregue e o que falta
+
+## Tecnologias
+
+TanStack Start · React 19 · TypeScript · Tailwind CSS v4 · Lovable Cloud (Supabase) · Roboflow
+(Supervision e RF-DETR, ambos com licença que permite uso comercial).
