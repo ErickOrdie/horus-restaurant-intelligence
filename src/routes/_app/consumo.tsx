@@ -1,0 +1,6 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useProfile } from "@/lib/auth";
+import { PageHeader } from "@/components/horus/PageHeader";
+import { VisionUsage } from "@/components/horus/VisionUsage";
+export const Route=createFileRoute("/_app/consumo")({component:Consumption,head:()=>({meta:[{title:"Consumo de IA · Hórus"},{name:"description",content:"Consumo real de inferências por modelo e unidade, tarifas, limites e erros."},{property:"og:title",content:"Consumo de IA · Hórus"},{property:"og:description",content:"Acompanhe consumo e custos estimados da visão computacional Hórus."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]})});
+function Consumption(){const {data:me,isPending}=useProfile();if(isPending)return null;if(!me?.roles.includes("admin"))return <p className="text-[13px] text-muted-foreground">Acesso restrito a administradores.</p>;return <><PageHeader section="Administração" title="Consumo de IA" description="Inferências, consumo por período e custos estimados."/><VisionUsage detailed/></>;}

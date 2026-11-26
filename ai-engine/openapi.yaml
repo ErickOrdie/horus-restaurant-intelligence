@@ -1,0 +1,60 @@
+openapi: 3.1.0
+info: { title: Hórus AI Engine, version: 0.1.0 }
+components:
+  securitySchemes:
+    horusKey: { type: apiKey, in: header, name: X-Horus-Key }
+  schemas:
+    DetectRequest:
+      type: object
+      required: [image_base64]
+      properties:
+        image_base64: { type: string }
+        mime: { type: string, enum: [image/jpeg, image/png, image/webp] }
+        min_confidence: { type: number, minimum: 0, maximum: 1, default: 0.5 }
+        model: { type: [string, "null"] }
+        version: { type: [string, "null"] }
+        unit_id: { type: [string, "null"] }
+        camera_id: { type: [string, "null"] }
+        zones: { type: [array, "null"], description: "normalized polygons for supervision PolygonZone" }
+    Detection:
+      type: object
+      required: [class_name, confidence, bbox]
+      properties:
+        class_name: { type: string }
+        class_id: { type: integer }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+        bbox: { type: array, items: { type: number }, minItems: 4, maxItems: 4, description: "normalized x1,y1,x2,y2" }
+        area_px: { type: number }
+        mask_polygon: { type: array, items: { type: array, items: { type: number }, minItems: 2, maxItems: 2 } }
+    DetectResponse:
+      type: object
+      required: [analysis_id, model, version, timestamp, processing_ms, detections, status]
+      properties:
+        analysis_id: { type: string }
+        model: { type: string }
+        version: { type: string }
+        timestamp: { type: string, format: date-time }
+        processing_ms: { type: number }
+        image_width: { type: integer }
+        image_height: { type: integer }
+        detections: { type: array, items: { $ref: "#/components/schemas/Detection" } }
+        estimates: { type: object }
+        status: { type: string, enum: [ok, error] }
+        error: { type: [string, "null"] }
+security: [{ horusKey: [] }]
+paths:
+  /health: { get: { summary: Estado do serviço e modelos carregados, responses: { "200": { description: OK } } } }
+  /models: { get: { summary: Modelos e origem, responses: { "200": { description: OK } } } }
+  /cameras/status: { get: { summary: Status das câmeras processadas, responses: { "200": { description: OK } } } }
+  /detect/food: &detect
+    post:
+      parameters: [{ in: header, name: Idempotency-Key, schema: { type: string } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/DetectRequest" } } } }
+      responses:
+        "200": { description: Detecções, content: { application/json: { schema: { $ref: "#/components/schemas/DetectResponse" } } } }
+        "400": { description: Imagem inválida }
+        "401": { description: Chave inválida }
+        "503": { description: Modelo indisponível (pesos ausentes) }
+  /detect/waste: *detect
+  /detect/objects: *detect
+  /segment/food: *detect

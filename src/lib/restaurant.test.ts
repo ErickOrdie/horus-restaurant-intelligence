@@ -1,0 +1,12 @@
+import { describe, it, expect } from "vitest";
+import { normalizeRestaurant, snapshotCounts, matchTableRegions, occupancyHistory } from "./restaurant";
+const response=(extra:object={})=>({outputs:[{visible_people_count:4,visible_table_count:0,predictions:{image:{width:null,height:null},predictions:[]},table_states:[],completed_table_visits:[],...extra}]});
+describe("Restaurant Intelligence",()=>{
+  it("normalizes the observed null dimensions on an empty workflow result",()=>expect(normalizeRestaurant(response()).snapshot.people).toBe(4));
+  it("keeps absent counts unknown instead of inventing zero",()=>expect(normalizeRestaurant({outputs:[{predictions:{image:{width:null,height:null},predictions:[]}}]}).snapshot.people).toBeNull());
+  it("never validates temporal continuity or persists completed visits",()=>{const r=normalizeRestaurant(response({completed_table_visits:[{person_track_id:12,duration_seconds:90}]}));expect(r.snapshot.temporalValidated).toBe(false);expect(r.snapshot).not.toHaveProperty("completed_table_visits");});
+  it("does not sum people from successive frames as distinct customers",()=>expect(occupancyHistory([{people_count:4,occupancy_percent:null,created_at:"2026-11-26T04:00:00Z"},{people_count:4,occupancy_percent:null,created_at:"2026-11-26T04:00:10Z"}])).toEqual({averagePeople:4,peakPeople:4,averageOccupancy:null}));
+  it("does not infer available tables from empty temporal states",()=>expect(snapshotCounts(normalizeRestaurant(response({visible_table_count:3})).snapshot)).toMatchObject({available:0,unknown:3,occupancy:null}));
+  it("never maps by detection order or ambiguous regions",()=>{const states=[{state:"ocupada" as const,bbox:[0.1,0.1,0.3,0.3] as [number,number,number,number]}];expect(matchTableRegions(states,[{table_id:"T02",points:[[0.5,0.5],[1,0.5],[1,1],[0.5,1]]}])[0]?.state).toBe("indeterminada");});
+  it("does not manufacture cleaning confirmation from an unknown automatic state",()=>{const r=normalizeRestaurant(response({visible_table_count:1,predictions:{image:{width:100,height:100},predictions:[]},table_states:[{table_id:5,state:"cleaning",bbox_xyxy:[10,10,30,30]}]}));expect(r.snapshot.states[0]?.state).toBe("indeterminada");});
+});
