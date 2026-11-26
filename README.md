@@ -78,3 +78,11 @@ aparentemente válida).
 
 TanStack Start · React 19 · TypeScript · Tailwind CSS v4 · Lovable Cloud (Supabase) · Roboflow
 (Supervision e RF-DETR, ambos com licença que permite uso comercial).
+
+##Vídeo
+
+https://github.com/user-attachments/assets/9838e0a2-627e-4c5a-bc5a-dcf19c40c393
+
+##Prints
+
+https://horustechnology.lovable.app/
